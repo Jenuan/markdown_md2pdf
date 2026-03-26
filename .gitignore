@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Python virtual environments
+.venv/
+recursos py/.venv/
+*.venv/
+
+# Python caches
+**/__pycache__/
+*.pyc
+
+# PDFs gerados (mantemos apenas os exemplos)
+docs/pdfs/*.pdf
+docs/pdfs_draganddrop/
+docs/pdfs_table_test/
+
+# Arquivos de exemplo que queremos commitar
+!docs/pdfs/example*.pdf
+
+# Pastas temporarias
+.tmp-venv/

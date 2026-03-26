@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+"""
+Converte arquivos Markdown (.md) para PDF.
+
+Uso rapido:
+  python "recursos py/tools/md_para_pdf.py" --input "docs/arquivo.md"
+  python "recursos py/tools/md_para_pdf.py" --input "docs" --recursive
+"""
+
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+from typing import Iterable
+
+import markdown
+from fpdf import FPDF
+from fpdf.fonts import TextStyle
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Converte Markdown para PDF (arquivo unico ou lote)."
+    )
+    parser.add_argument("--input", "-i", help="Arquivo .md ou pasta de origem.")
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        help="Caminhos de arquivos/pastas para conversao (arrastar e soltar).",
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        default="docs/pdfs",
+        help="Pasta de destino dos PDFs (padrao: docs/pdfs).",
+    )
+    parser.add_argument(
+        "--glob",
+        dest="glob_pattern",
+        default="*.md",
+        help='Padrao de arquivos quando input for pasta (padrao: "*.md").',
+    )
+    parser.add_argument(
+        "--recursive",
+        "-r",
+        action="store_true",
+        help="Busca recursiva ao converter uma pasta.",
+    )
+    return parser.parse_args()
+
+
+def wrap_html(content_html: str, title: str) -> str:
+    return f"<h1>{title}</h1>\n{content_html}"
+
+
+def markdown_to_html(md_text: str) -> str:
+    # `tables` habilita geração de HTML com `<table>...</table>` a partir do
+    # markdown (formato estilo GitHub).
+    return markdown.markdown(
+        md_text, extensions=["sane_lists", "smarty", "nl2br", "tables"]
+    )
+
+
+def normalize_for_pdf(md_text: str) -> str:
+    return md_text.replace("\ufe0f", "").translate(
+        {
+            ord("📌"): "",
+            ord("📎"): "",
+            ord("📚"): "",
+            ord("⚠"): "",
+        }
+    )
+
+
+def enhance_table_html(html: str) -> str:
+    """
+    `fpdf2` renderiza `<table>` melhor quando alguns atributos estão presentes.
+    Como o markdown->html não costuma incluir bordas/padding, aplicamos um
+    "polish" mínimo.
+    """
+    import re
+    from html import unescape
+
+    def _repl(match: re.Match[str]) -> str:
+        attrs = match.group(1) or ""
+        if re.search(r"\bborder\s*=", attrs, flags=re.IGNORECASE):
+            return match.group(0)
+        attrs = attrs.strip()
+        prefix = f" {attrs}" if attrs else ""
+        return f'<table{prefix} border="1" cellpadding="4" cellspacing="0">'
+
+    # 1) Garanta atributos mínimos em `<table>`.
+    out = re.sub(r"<table([^>]*)>", _repl, html, flags=re.IGNORECASE)
+
+    # 2) O `fpdf2` pode falhar quando `<td>/<th>` contêm tags internas
+    # (ex.: `<a>`, `<strong>`, etc). Para tornar o render robusto,
+    # preservamos apenas texto dentro das células.
+    #
+    # Isso remove a marcação e mantém o conteúdo textual, evitando o erro:
+    # "Unsupported nested HTML tags inside <td> element: <td>".
+    def _cell_repl(cell_match: re.Match[str]) -> str:
+        tag = cell_match.group(1).lower()  # td | th
+        attrs = cell_match.group(2) or ""
+        inner_html = cell_match.group(3) or ""
+
+        # Converta quebras em espaços para não criar "fragmentos" extras.
+        inner_html = re.sub(r"<br\\s*/?>", " ", inner_html, flags=re.IGNORECASE)
+        # Remova qualquer tag restante, deixando só texto.
+        inner_text = re.sub(r"<[^>]+>", "", inner_html)
+        inner_text = unescape(inner_text)
+        inner_text = re.sub(r"\\s+", " ", inner_text).strip()
+
+        return f"<{tag}{attrs}>{inner_text}</{tag}>"
+
+    # matches: <td ...> ... </td> e <th ...> ... </th>
+    out = re.sub(
+        # `\b` evita que tags container como `<thead>` sejam interpretadas
+        # erroneamente como `<th ...>`.
+        r"<(td|th)\b([^>]*)>(.*?)</\1>",
+        _cell_repl,
+        out,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    return out
+
+
+def html_to_pdf(html_content: str, output_pdf: Path) -> bool:
+    output_pdf.parent.mkdir(parents=True, exist_ok=True)
+    pdf = FPDF(format="A4")
+    pdf.set_auto_page_break(auto=True, margin=15)
+    unicode_font = "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"
+    pdf.add_font("ArialUnicode", "", unicode_font)
+    pdf.add_font("ArialUnicode", "B", unicode_font)
+    pdf.add_font("ArialUnicode", "I", unicode_font)
+    pdf.add_font("ArialUnicode", "BI", unicode_font)
+    pdf.add_page()
+    pdf.set_font("ArialUnicode", size=11)
+    html_content = enhance_table_html(html_content)
+    pdf.write_html(
+        html_content,
+        table_line_separators=True,
+        tag_styles={
+            "p": TextStyle(t_margin=1.0, b_margin=2.0),
+            "h1": TextStyle(
+                font_family="ArialUnicode",
+                font_size_pt=22,
+                color="#960000",
+                t_margin=3.0,
+                b_margin=2.5,
+            ),
+            "h2": TextStyle(
+                font_family="ArialUnicode",
+                font_size_pt=18,
+                color="#960000",
+                t_margin=2.5,
+                b_margin=2.0,
+            ),
+            "h3": TextStyle(
+                font_family="ArialUnicode",
+                font_size_pt=14,
+                color="#960000",
+                t_margin=2.0,
+                b_margin=1.8,
+            ),
+        },
+    )
+    pdf.output(str(output_pdf))
+    return True
+
+
+def build_output_path(source_file: Path, input_root: Path, output_root: Path) -> Path:
+    if source_file == input_root:
+        return output_root / f"{source_file.stem}.pdf"
+    relative = source_file.relative_to(input_root)
+    return (output_root / relative).with_suffix(".pdf")
+
+
+def collect_markdown_files(input_path: Path, glob_pattern: str, recursive: bool) -> list[Path]:
+    if input_path.is_file():
+        if input_path.suffix.lower() != ".md":
+            raise ValueError("O arquivo de entrada precisa ter extensao .md")
+        return [input_path]
+    if not input_path.is_dir():
+        raise ValueError(f"Caminho de entrada nao encontrado: {input_path}")
+    iterator: Iterable[Path] = (
+        input_path.rglob(glob_pattern) if recursive else input_path.glob(glob_pattern)
+    )
+    return sorted(path for path in iterator if path.is_file() and path.suffix.lower() == ".md")
+
+
+def collect_from_multiple_inputs(
+    raw_paths: list[str], glob_pattern: str, recursive: bool
+) -> tuple[list[Path], list[str]]:
+    files: set[Path] = set()
+    errors: list[str] = []
+    for raw_path in raw_paths:
+        input_path = Path(raw_path).expanduser().resolve()
+        try:
+            files.update(collect_markdown_files(input_path, glob_pattern, recursive))
+        except ValueError as exc:
+            errors.append(f"{input_path}: {exc}")
+    return sorted(files), errors
+
+
+def convert_file(source_file: Path, input_root: Path, output_root: Path) -> tuple[Path, bool, str]:
+    try:
+        md_text = normalize_for_pdf(source_file.read_text(encoding="utf-8"))
+        html_body = markdown_to_html(md_text)
+        out_pdf = build_output_path(source_file, input_root, output_root)
+        ok = html_to_pdf(wrap_html(html_body, source_file.stem), out_pdf)
+        if not ok:
+            return out_pdf, False, "Falha na etapa de geracao do PDF."
+        return out_pdf, True, ""
+    except Exception as exc:  # noqa: BLE001
+        return output_root / f"{source_file.stem}.pdf", False, str(exc)
+
+
+def main() -> int:
+    args = parse_args()
+    output_root = Path(args.output).expanduser().resolve()
+    all_inputs = [*args.paths]
+    if args.input:
+        all_inputs.append(args.input)
+    if not all_inputs:
+        print("Erro: informe --input ou arraste arquivo(s)/pasta(s) para o comando.")
+        return 1
+
+    files, input_errors = collect_from_multiple_inputs(all_inputs, args.glob_pattern, args.recursive)
+    for error in input_errors:
+        print(f"[ERRO] {error}")
+    if not files:
+        print("Nenhum arquivo .md encontrado com os criterios informados.")
+        return 1
+
+    success_count = 0
+    failure_count = 0
+    for md_file in files:
+        input_root = md_file.parent
+        for source in all_inputs:
+            source_path = Path(source).expanduser().resolve()
+            if source_path.is_dir():
+                try:
+                    md_file.relative_to(source_path)
+                    input_root = source_path
+                    break
+                except ValueError:
+                    continue
+        output_pdf, ok, err = convert_file(md_file, input_root, output_root)
+        if ok:
+            success_count += 1
+            print(f"[OK] {md_file} -> {output_pdf}")
+        else:
+            failure_count += 1
+            print(f"[ERRO] {md_file}: {err}")
+
+    total_failures = failure_count + len(input_errors)
+    print(f"\nConcluido. Sucessos: {success_count} | Falhas: {total_failures}")
+    return 0 if total_failures == 0 else 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
