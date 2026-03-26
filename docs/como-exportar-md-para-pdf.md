@@ -1,4 +1,47 @@
-# Como exportar Markdown para PDF
+# Export Markdown to PDF (EN) / Como exportar Markdown para PDF (PT)
+
+Este guia mostra como converter `.md` em `.pdf` localmente usando Python e `fpdf2`.
+
+---
+
+## EN: Export Markdown to PDF
+
+### 1) Install dependencies
+From the repo root:
+```bash
+python3 -m venv "recursos py/.venv"
+source "recursos py/.venv/bin/activate"
+pip install -r requirements-md2pdf.txt
+```
+
+### 2) Convert a single file
+```bash
+python "recursos py/tools/md_para_pdf.py" --input "example.md" --output "docs/pdfs"
+```
+
+### 3) Convert a folder (recursive)
+```bash
+python "recursos py/tools/md_para_pdf.py" --input "docs" --recursive --output "docs/pdfs"
+```
+
+### 4) Filter by pattern (glob)
+```bash
+python "recursos py/tools/md_para_pdf.py" --input "docs" --recursive --glob "*.md" --output "docs/pdfs"
+```
+
+### 5) Drag & drop on macOS (no terminal)
+Use:
+- `recursos py/tools/md_para_pdf_drop.command`
+
+After running the shortcut, it will ask you to choose the destination folder for the PDFs.
+
+### 6) Automator (macOS)
+If you prefer a macOS App / Quick Action:
+- `docs/como-criar-automator-md-para-pdf.md`
+
+---
+
+## PT: Como exportar Markdown para PDF
 
 Este projeto tem um script Python para converter arquivos `.md` em `.pdf`, ideal para compartilhar no Google Drive ou WhatsApp.
 
@@ -15,21 +58,21 @@ pip install -r requirements-md2pdf.txt
 ## 2) Converter um arquivo unico
 
 ```bash
-python "recursos py/tools/md_para_pdf.py" --input "docs/Roteiros e produção/[i][vd][corte_mito_01_harpas_anjos_nuvens].md" --output "docs/pdfs"
+python "recursos py/tools/md_para_pdf.py" --input "example.md" --output "docs/pdfs"
 ```
 
 ## 3) Converter varios arquivos da pasta (recursivo)
 
 ```bash
-python "recursos py/tools/md_para_pdf.py" --input "docs/Roteiros e produção" --recursive --output "docs/pdfs"
+python "recursos py/tools/md_para_pdf.py" --input "docs" --recursive --output "docs/pdfs"
 ```
 
 ## 4) Filtrar por padrao (glob)
 
-Somente arquivos de Shorts:
+Todos os `.md`:
 
 ```bash
-python "recursos py/tools/md_para_pdf.py" --input "docs/Roteiros e produção" --recursive --glob "*shorts*.md" --output "docs/pdfs"
+python "recursos py/tools/md_para_pdf.py" --input "docs" --recursive --glob "*.md" --output "docs/pdfs"
 ```
 
 ## Onde os PDFs ficam
@@ -50,12 +93,12 @@ Existe um atalho em `recursos py/tools/md_para_pdf_drop.command`.
 - Arraste 1 ou mais arquivos `.md` para `recursos py/tools/md_para_pdf_drop.command`; ou
 - Arraste uma pasta com arquivos `.md`.
 
-O atalho chama automaticamente o conversor e grava os PDFs em `docs/pdfs_draganddrop/`.
+O atalho chama automaticamente o conversor e pede para você escolher a pasta de destino dos PDFs.
 
 Tambem e possivel rodar pelo terminal:
 
 ```bash
-"recursos py/tools/md_para_pdf_drop.command" "docs/Roteiros e produção"
+"recursos py/tools/md_para_pdf_drop.command" "example.md"
 ```
 
 ## 6) Automator (mais facil)

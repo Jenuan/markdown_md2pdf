@@ -1,3 +1,16 @@
+# Create Automator (App + Quick Action) (EN) / Como criar Automator (PT)
+
+This guide creates two macOS shortcuts to convert `.md` files into `.pdf`:
+- App (drag & drop)
+- Finder Quick Action (right-click)
+
+Both shortcuts use:
+- `recursos py/tools/md_para_pdf_automator.sh`
+
+Note: replace `/SEU_CAMINHO_DO_PROJETO/` with the absolute path to this project on your Mac.
+
+---
+
 # Como criar Automator (App + Ação Rápida)
 
 Este guia cria dois atalhos no macOS para converter `.md` em `.pdf`:
