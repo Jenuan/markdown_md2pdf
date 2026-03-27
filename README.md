@@ -112,7 +112,7 @@ Depois de instalar as dependências, arraste 1 ou mais arquivos `.md` (ou uma pa
 
 Os PDFs gerados ficam em uma pasta dentro de `docs/`.
 
-## Using Automator (macOS) (EN + PT)
+## Using Automator (macOS)
 
 ### EN
 If you prefer creating a macOS App / Quick Action, follow:
@@ -122,14 +122,14 @@ If you prefer creating a macOS App / Quick Action, follow:
 Se você prefere criar um App / Ação Rápida no macOS:
 - [Guia do Automator (PT)](docs/como-criar-automator-md-para-pdf.md)
 
-## Examples (EN + PT)
+## Examples 
 
 - `example.md` -> `docs/pdfs/example.pdf`
 - `example2.md` -> `docs/pdfs/example2.pdf`
 
 These samples include different title levels and tables to show how Markdown turns into PDF.
 
-## FAQ (EN + PT)
+## FAQ 
 
 ### EN
 1. Does it require an internet connection or API keys?
@@ -151,7 +151,7 @@ These samples include different title levels and tables to show how Markdown tur
 4. Onde os PDFs são salvos?
    - Na pasta definida em `--output` (nos exemplos usamos `docs/pdfs/`).
 
-## Security & Privacy (EN + PT)
+## Security & Privacy 
 
 ### EN
 - The process is local/offline.
@@ -163,7 +163,7 @@ These samples include different title levels and tables to show how Markdown tur
 - Não usa API keys, tokens nem serviços externos para gerar os PDFs.
 - Se você compartilhar token/senhas em conversas, revogue/rotate na conta do GitHub e nunca envie segredos para um repositório público.
 
-## SEO keywords (EN + PT)
+## Keywords
 
 This repo is useful for: **convert markdown to PDF**, **MD to PDF**, **generate PDF from Markdown**, **markdown to pdf**, **automator markdown to pdf**, and working with **python + fpdf2**.
 
