@@ -9,6 +9,8 @@ Both shortcuts use:
 
 Note: replace `/SEU_CAMINHO_DO_PROJETO/` with the absolute path to this project on your Mac.
 
+macOS-only: Automator and Finder Quick Actions are macOS features and are not available on Windows/Linux.
+
 ---
 
 # Como criar Automator (App + Ação Rápida)
@@ -21,6 +23,8 @@ Este guia cria dois atalhos no macOS para converter `.md` em `.pdf`:
 Os dois usam o script:
 
 - `recursos py/tools/md_para_pdf_automator.sh`
+
+Somente macOS: Automator e Acoes Rapidas do Finder sao recursos do macOS e nao estao disponiveis em Windows/Linux.
 
 ## Preparação
 
@@ -76,6 +80,19 @@ Saida esperada:
 
 - A Ação Rápida abre um seletor para voce escolher a pasta de destino dos PDFs.
 - Se cancelar a selecao, a execucao e encerrada sem gerar arquivos.
+
+### Onde aparece (Finder Quick Actions)
+
+- EN: Open Finder, right-click a `.md` file (or a folder with `.md` files), then look under **Quick Actions**.
+- PT: Abra o Finder, clique com o botao direito em um arquivo `.md` (ou pasta com `.md`) e veja em **Acoes Rapidas**.
+
+### Se nao aparecer em Quick Actions
+
+- EN: In Automator, confirm the workflow receives `files or folders` in `Finder`.
+- PT: No Automator, confirme que o fluxo recebe `arquivos ou pastas` no `Finder`.
+- EN: Enable it in `System Settings > Privacy & Security > Extensions > Finder Extensions > Quick Actions` (path may vary by macOS version).
+- PT: Habilite em `Ajustes do Sistema > Privacidade e Seguranca > Extensoes > Extensoes do Finder > Acoes Rapidas` (o caminho pode variar por versao do macOS).
+- EN/PT: Try right-clicking again and, if needed, restart Finder.
 
 ## 3) Permissões no macOS
 

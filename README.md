@@ -115,10 +115,18 @@ Os PDFs gerados ficam em uma pasta dentro de `docs/`.
 ## Using Automator (macOS)
 
 ### EN
+macOS-only: Automator and Finder Quick Actions are macOS features (not available on Windows/Linux).
+
+Finder Quick Actions: create a Quick Action in Automator, save it, then right-click a `.md` file (or folder) in Finder and use **Quick Actions**.
+
 If you prefer creating a macOS App / Quick Action, follow:
 - [Automator guide (EN)](docs/como-criar-automator-md-para-pdf.md)
 
 ### PT
+Somente macOS: Automator e Acoes Rapidas do Finder sao recursos do macOS (nao disponiveis em Windows/Linux).
+
+Acoes Rapidas no Finder: crie a Ação Rápida no Automator, salve, depois clique com o botao direito em um arquivo `.md` (ou pasta) no Finder e use **Acoes Rapidas**.
+
 Se você prefere criar um App / Ação Rápida no macOS:
 - [Guia do Automator (PT)](docs/como-criar-automator-md-para-pdf.md)
 
