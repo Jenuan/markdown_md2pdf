@@ -115,29 +115,21 @@ Os PDFs gerados ficam em uma pasta dentro de `docs/`.
 ## Using Automator (macOS)
 
 ### EN
-macOS-only: Automator and Finder Quick Actions are macOS features (not available on Windows/Linux).
-
-Finder Quick Actions: create a Quick Action in Automator, save it, then right-click a `.md` file (or folder) in Finder and use **Quick Actions**.
-
 If you prefer creating a macOS App / Quick Action, follow:
 - [Automator guide (EN)](docs/como-criar-automator-md-para-pdf.md)
 
 ### PT
-Somente macOS: Automator e Acoes Rapidas do Finder sao recursos do macOS (nao disponiveis em Windows/Linux).
-
-Acoes Rapidas no Finder: crie a Ação Rápida no Automator, salve, depois clique com o botao direito em um arquivo `.md` (ou pasta) no Finder e use **Acoes Rapidas**.
-
 Se você prefere criar um App / Ação Rápida no macOS:
 - [Guia do Automator (PT)](docs/como-criar-automator-md-para-pdf.md)
 
-## Examples 
+## Examples
 
 - `example.md` -> `docs/pdfs/example.pdf`
 - `example2.md` -> `docs/pdfs/example2.pdf`
 
 These samples include different title levels and tables to show how Markdown turns into PDF.
 
-## FAQ 
+## FAQ
 
 ### EN
 1. Does it require an internet connection or API keys?
@@ -159,7 +151,7 @@ These samples include different title levels and tables to show how Markdown tur
 4. Onde os PDFs são salvos?
    - Na pasta definida em `--output` (nos exemplos usamos `docs/pdfs/`).
 
-## Security & Privacy 
+## Security & Privacy
 
 ### EN
 - The process is local/offline.

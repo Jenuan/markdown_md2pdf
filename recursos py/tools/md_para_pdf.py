@@ -15,7 +15,67 @@ from typing import Iterable
 
 import markdown
 from fpdf import FPDF
-from fpdf.fonts import TextStyle
+from fpdf.fonts import FontFace, TextStyle
+
+
+def _monochrome_html_tag_styles() -> dict:
+    """Cores neutras (preto) para substituir os defaults coloridos do fpdf2."""
+    fam = "ArialUnicode"
+    black = "#000000"
+    return {
+        "a": FontFace(color=black, emphasis="UNDERLINE"),
+        "u": FontFace(color=black, emphasis="UNDERLINE"),
+        "blockquote": TextStyle(font_family=fam, color=black, t_margin=3, b_margin=3),
+        "p": TextStyle(font_family=fam, color=black, t_margin=1.0, b_margin=2.0),
+        "h1": TextStyle(
+            font_family=fam,
+            font_style="B",
+            font_size_pt=22,
+            color=black,
+            t_margin=3.0,
+            b_margin=2.5,
+        ),
+        "h2": TextStyle(
+            font_family=fam,
+            font_style="B",
+            font_size_pt=18,
+            color=black,
+            t_margin=2.5,
+            b_margin=2.0,
+        ),
+        "h3": TextStyle(
+            font_family=fam,
+            font_style="B",
+            font_size_pt=14,
+            color=black,
+            t_margin=2.0,
+            b_margin=1.8,
+        ),
+        "h4": TextStyle(
+            font_family=fam,
+            font_style="B",
+            font_size_pt=12,
+            color=black,
+            t_margin=1.8,
+            b_margin=1.5,
+        ),
+        "h5": TextStyle(
+            font_family=fam,
+            font_style="B",
+            font_size_pt=10,
+            color=black,
+            t_margin=1.5,
+            b_margin=1.2,
+        ),
+        "h6": TextStyle(
+            font_family=fam,
+            font_style="B",
+            font_size_pt=8,
+            color=black,
+            t_margin=1.2,
+            b_margin=1.0,
+        ),
+    }
 
 
 def parse_args() -> argparse.Namespace:
@@ -62,14 +122,9 @@ def markdown_to_html(md_text: str) -> str:
 
 
 def normalize_for_pdf(md_text: str) -> str:
-    return md_text.replace("\ufe0f", "").translate(
-        {
-            ord("📌"): "",
-            ord("📎"): "",
-            ord("📚"): "",
-            ord("⚠"): "",
-        }
-    )
+    # Apenas remove variation selector (pode evitar emoji estilizado em algumas fontes).
+    # Emojis no texto sao preservados.
+    return md_text.replace("\ufe0f", "")
 
 
 def enhance_table_html(html: str) -> str:
@@ -139,30 +194,7 @@ def html_to_pdf(html_content: str, output_pdf: Path) -> bool:
     pdf.write_html(
         html_content,
         table_line_separators=True,
-        tag_styles={
-            "p": TextStyle(t_margin=1.0, b_margin=2.0),
-            "h1": TextStyle(
-                font_family="ArialUnicode",
-                font_size_pt=22,
-                color="#960000",
-                t_margin=3.0,
-                b_margin=2.5,
-            ),
-            "h2": TextStyle(
-                font_family="ArialUnicode",
-                font_size_pt=18,
-                color="#960000",
-                t_margin=2.5,
-                b_margin=2.0,
-            ),
-            "h3": TextStyle(
-                font_family="ArialUnicode",
-                font_size_pt=14,
-                color="#960000",
-                t_margin=2.0,
-                b_margin=1.8,
-            ),
-        },
+        tag_styles=_monochrome_html_tag_styles(),
     )
     pdf.output(str(output_pdf))
     return True
